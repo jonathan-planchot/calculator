@@ -28,7 +28,8 @@ button {
     border-radius: 3px;
 }
 
-.box.digit:active {
+.box.digit:active,
+.box.backspace:active {
   box-shadow: 0px 0px 2px 2px #fc894d;
   background-color: #cccccc0a;
 }
@@ -63,7 +64,8 @@ button {
 }
 
 .digit,
-.clear {
+.clear,
+.backspace {
     background-color: white;
 }
 

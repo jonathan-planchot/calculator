@@ -36,13 +36,31 @@ let secondOperand = null;
 let operator = null;
 let result = null;
 let resultDisplayed = false;
+let currentOperand = null;
 
 const container = document.querySelector(".container");
 const display = document.querySelector(".display");
 const pointButton = document.querySelector(".box.point");
-console.log(container);
+const backspaceButton = document.querySelector(".box.backspace");
 
 container.addEventListener("click", event => {
+    
+    if(event.target.classList.contains("backspace")) {
+        if(currentOperand === "first") {
+            if(firstOperand.length > 1) {
+                firstOperand = firstOperand.slice(0, -1);
+            } else if(firstOperand.length === 1) {
+                firstOperand = 0;
+            }
+        } else if(currentOperand === "second") {
+            if(secondOperand.length > 1) {
+                secondOperand = secondOperand.slice(0, -1);
+            } else if(secondOperand.length === 1) {
+                secondOperand = 0;
+            }
+        } 
+        display.textContent = currentOperand === "first" ? firstOperand : secondOperand;
+    }
 
     if(event.target.classList.contains("clear")) {
         firstOperand = null;
@@ -56,6 +74,7 @@ container.addEventListener("click", event => {
     if(event.target.classList.contains("digit") && operator === null) {
         
         pointButton.disabled = false;
+        currentOperand = "first";
 
         if(firstOperand === ".") {
             firstOperand = 0 + ".";
@@ -81,6 +100,7 @@ container.addEventListener("click", event => {
     if(event.target.classList.contains("digit") && operator !== null) {
 
         pointButton.disabled = false;
+        currentOperand = "second";
         
         if(secondOperand === ".") {
             secondOperand = 0 + ".";
@@ -93,7 +113,7 @@ container.addEventListener("click", event => {
             if(secondOperand.toString().includes(".")) {
                 pointButton.disabled = true;
                 secondOperand += event.target.textContent;
-            } else if(secondOperand === "0") {
+            } else if(secondOperand === 0) {
                 secondOperand = event.target.textContent;
             } else {
             secondOperand += event.target.textContent;
@@ -144,6 +164,9 @@ container.addEventListener("click", event => {
 
     if(event.target.classList.contains("equal")) {
         removeOperatorShine();
+
+        if(operator === null || secondOperand === null) return;
+
         if(secondOperand === 0 && operator === "÷") return display.textContent = "Error, you can't divide by 0!";
         
         result = operate(operator, firstOperand, secondOperand);
@@ -161,6 +184,7 @@ container.addEventListener("click", event => {
     console.log(`The second operand is ${secondOperand}`);
     console.log(`The operator is ${operator}`);  
     console.log(`The result is ${result}`);    
+    console.log(currentOperand);
 });
 
 function removeOperatorShine() {
