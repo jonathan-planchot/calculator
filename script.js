@@ -35,9 +35,11 @@ let firstOperand = null;
 let secondOperand = null;
 let operator = null;
 let result = null;
+let resultDisplayed = false;
 
 const container = document.querySelector(".container");
 const display = document.querySelector(".display");
+const pointButton = document.querySelector(".box.point");
 console.log(container);
 
 container.addEventListener("click", event => {
@@ -47,48 +49,95 @@ container.addEventListener("click", event => {
         secondOperand = null;
         operator = null;
         result = null;
+        resultDisplayed = false;
         display.textContent = 0;
     }
 
     if(event.target.classList.contains("digit") && operator === null) {
-        if(firstOperand === null) {
+        
+        pointButton.disabled = false;
+
+        if(firstOperand === ".") {
+            firstOperand = 0 + ".";
+            display.textContent = firstOperand;
+        } else if(firstOperand === null) {
             firstOperand = event.target.textContent;
-        } else {
+        } else if(firstOperand === "0" && event.target.textContent === "0") {
+            // ne rien faire
+        } else if(firstOperand !== null) {
+            if(firstOperand.toString().includes(".")) {
+                pointButton.disabled = true;
+                firstOperand += event.target.textContent;
+            } else if(firstOperand === 0) {
+                firstOperand = event.target.textContent;
+            } else {
             firstOperand += event.target.textContent;
+            }
         }
         display.textContent = firstOperand;
+        resultDisplayed = false;
     }
 
     if(event.target.classList.contains("digit") && operator !== null) {
-        secondOperand = Number(event.target.textContent);
+
+        pointButton.disabled = false;
+        
+        if(secondOperand === ".") {
+            secondOperand = 0 + ".";
+            display.textContent = secondOperand;
+        } else if(secondOperand === null) {
+            secondOperand = event.target.textContent;
+        } else if(secondOperand === "0" && event.target.textContent === "0") {
+            // ne rien faire
+        } else if(secondOperand !== null) {
+            if(secondOperand.toString().includes(".")) {
+                pointButton.disabled = true;
+                secondOperand += event.target.textContent;
+            } else if(secondOperand === "0") {
+                secondOperand = event.target.textContent;
+            } else {
+            secondOperand += event.target.textContent;
+            }
+        }
+        if(resultDisplayed === true) firstOperand = result;
         display.textContent = secondOperand;
+        resultDisplayed = false;
     }
 
     if(event.target.classList.contains("operator") && !event.target.classList.contains("equal")) {
         removeOperatorShine();
-        
-        if(result === null && operator !== null) {
+
+        if(secondOperand === null) {
+
+            operator = event.target.textContent;
+            resultDisplayed = false;
+
+        } else if(secondOperand !== null) {
+
             if(secondOperand === 0 && operator === "÷") {
                 display.textContent = "Error, you can't divide by 0!";
-            } else {
+            } else if(resultDisplayed === false) {
                 result = operate(operator, firstOperand, secondOperand);
                 if(result !== null && result.toString().length > 10) {
                     result = Number(result.toFixed(5));
                 }
-
                 display.textContent = result;
-                firstOperand = result; 
                 operator = event.target.textContent;
+                secondOperand = null;
+                resultDisplayed = true;
+            } else if(resultDisplayed === true) {
+                display.textContent = result;
+                firstOperand = result;
+                result = operate(operator, firstOperand, secondOperand);
+                if(result !== null && result.toString().length > 10) {
+                    result = Number(result.toFixed(5));
+                }
+                operator = event.target.textContent;
+                secondOperand = null;
+                resultDisplayed = true; 
             }
-        } else if(secondOperand !== null && operator === null) {
-            operator = event.target.textContent;
-            display.textContent = firstOperand;
-        } else if(result !== null && operator !== null) {
-            firstOperand = result; 
-            operator = event.target.textContent;
-        } else {
-            operator = event.target.textContent;
-        }
+
+        } 
 
         event.target.classList.add("shining");
     }
@@ -104,6 +153,9 @@ container.addEventListener("click", event => {
 
         display.textContent = result;
         firstOperand = result;
+        result = null;
+        secondOperand = null;
+        operator = null;
     }
     console.log(`The first operand is ${firstOperand}`);
     console.log(`The second operand is ${secondOperand}`);
